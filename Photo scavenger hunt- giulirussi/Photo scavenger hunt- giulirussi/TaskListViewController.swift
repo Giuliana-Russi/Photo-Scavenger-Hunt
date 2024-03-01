@@ -1,0 +1,62 @@
+//
+//  TaskListViewController.swift
+//  Photo scavenger hunt- giulirussi
+//
+//  Created by Giuliana Russi on 2/19/24.
+//
+
+import UIKit
+
+class TaskListViewController: UIViewController {
+
+    @IBOutlet weak var tableView: UITableView!
+    
+    var tasks = [Task]() {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        tableView.tableHeaderView = UIView()
+
+        tableView.dataSource = self
+        tasks = Task.mockedTasks
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        tableView.reloadData()
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+         if let detailViewController = segue.destination as? TaskDetailViewController,
+           let selectedIndexPath = tableView.indexPathForSelectedRow {
+
+            let task = tasks[selectedIndexPath.row]
+
+            detailViewController.task = task
+        }
+    }
+}
+
+extension TaskListViewController: UITableViewDataSource {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return tasks.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath) as? TaskCell else {
+            fatalError("Unable to dequeue Task Cell")
+        }
+
+        cell.configure(with: tasks[indexPath.row])
+
+        return cell
+    }
+}
